@@ -31,15 +31,42 @@ class GameScene: SKScene {
         
         self.addChild(counterClockwiseButton)
         
+        let clockwiseButton = SKShapeNode()
         
+        clockwiseButton.path = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 45, height: 45)).cgPath
+        clockwiseButton.position = CGPoint(x: view.scene!.frame.maxX-70, y: view.scene!.frame.minY+30)
+        clockwiseButton.fillColor = UIColor.black
+        clockwiseButton.strokeColor = UIColor.green
+        clockwiseButton.lineWidth = 10
+        
+        clockwiseButton.name = "clockwiseButton"
+        
+        self.addChild(clockwiseButton)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-
+        for touch in touches {
+            let touchLocation = touch.location(in: self)
+            
+            guard  let touchesNode = self.atPoint(touchLocation) as? SKShapeNode, touchesNode.name == "counterClockwiseButton" || touchesNode.name == "clockwiseButton" else {
+                return
+            }
+            
+            touchesNode.fillColor = .lightGray
+            
+        }
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-
+        for touch in touches {
+            let touchLocation = touch.location(in: self)
+            
+            guard  let touchesNode = self.atPoint(touchLocation) as? SKShapeNode, touchesNode.name == "counterClockwiseButton" || touchesNode.name == "clockwiseButton" else {
+                return
+            }
+            
+            touchesNode.fillColor = .black
+        }
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
