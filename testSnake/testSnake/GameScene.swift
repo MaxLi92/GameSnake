@@ -28,37 +28,18 @@ class GameScene: SKScene {
         self.physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
         self.physicsBody?.allowsRotation = false
         
+        
         view.showsPhysics = true
         
-        let counterClockwiseButton = SKShapeNode()
+
         
-        counterClockwiseButton.path = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 45, height: 45)).cgPath
-        counterClockwiseButton.position = CGPoint(x: view.scene!.frame.minX+30, y: view.scene!.frame.minY+30)
-        counterClockwiseButton.fillColor = UIColor.black
-        counterClockwiseButton.strokeColor = UIColor.green
-        counterClockwiseButton.lineWidth = 10
+        start()
         
-        counterClockwiseButton.name = "counterClockwiseButton"
+//        createApple()
         
-        self.addChild(counterClockwiseButton)
+//        snake = Snake(atPoint: CGPoint(x:view.scene!.frame.midX, y:view.scene!.frame.midY))
         
-        let clockwiseButton = SKShapeNode()
-        
-        clockwiseButton.path = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 45, height: 45)).cgPath
-        clockwiseButton.position = CGPoint(x: view.scene!.frame.maxX-70, y: view.scene!.frame.minY+30)
-        clockwiseButton.fillColor = UIColor.black
-        clockwiseButton.strokeColor = UIColor.green
-        clockwiseButton.lineWidth = 10
-        
-        clockwiseButton.name = "clockwiseButton"
-        
-        self.addChild(clockwiseButton)
-        
-        createApple()
-        
-        snake = Snake(atPoint: CGPoint(x:view.scene!.frame.midX, y:view.scene!.frame.midY))
-        
-        self.addChild(snake!)
+//        self.addChild(snake!)
         
         self.physicsWorld.contactDelegate = self
         
@@ -114,9 +95,47 @@ class GameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         
-        snake!.move()
+        snake?.move()
     
     }
+    
+    private func start() {
+        
+        let counterClockwiseButton = SKShapeNode()
+        
+        counterClockwiseButton.path = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 45, height: 45)).cgPath
+        counterClockwiseButton.position = CGPoint(x: view!.scene!.frame.minX+30, y: view!.scene!.frame.minY+30)
+        counterClockwiseButton.fillColor = UIColor.black
+        counterClockwiseButton.strokeColor = UIColor.green
+        counterClockwiseButton.lineWidth = 10
+        
+        counterClockwiseButton.name = "counterClockwiseButton"
+        
+        self.addChild(counterClockwiseButton)
+        
+        let clockwiseButton = SKShapeNode()
+        
+        clockwiseButton.path = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: 45, height: 45)).cgPath
+        clockwiseButton.position = CGPoint(x: view!.scene!.frame.maxX-70, y: view!.scene!.frame.minY+30)
+        clockwiseButton.fillColor = UIColor.black
+        clockwiseButton.strokeColor = UIColor.green
+        clockwiseButton.lineWidth = 10
+        
+        clockwiseButton.name = "clockwiseButton"
+        
+        self.addChild(clockwiseButton)
+ 
+        snake = Snake(atPoint: CGPoint(x:view!.scene!.frame.midX, y:view!.scene!.frame.midY))
+        self.addChild(snake!)
+ 
+        createApple()
+    }
+    
+    private func stop() {
+        snake = nil
+        self.removeAllChildren()
+    }
+    
 }
 
 extension GameScene: SKPhysicsContactDelegate {
@@ -134,9 +153,8 @@ extension GameScene: SKPhysicsContactDelegate {
             apple?.removeFromParent()
             createApple()
         case CollisionCategory.EdgeBody:
-        //home
-        break
-        
+            stop()
+            start()
         default:
             break
 
