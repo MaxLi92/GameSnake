@@ -8,7 +8,18 @@
 import SpriteKit
 import GameplayKit
 
+struct CollisionCategory {
+    
+    static let Snake: UInt32 = 0x1 << 0
+    static let SnakeHead: UInt32 = 0x1 << 1
+    static let Apple: UInt32 = 0x1 << 2
+    static let EdgeBody: UInt32 = 0x1 << 3
+    
+}
+
 class GameScene: SKScene {
+    
+    var snake: Snake?
    
     override func didMove(to view: SKView) {
         backgroundColor = SKColor.darkGray
@@ -42,6 +53,28 @@ class GameScene: SKScene {
         clockwiseButton.name = "clockwiseButton"
         
         self.addChild(clockwiseButton)
+        
+        createApple()
+        
+        snake = Snake(atPoint: CGPoint(x:view.scene!.frame.midX, y:view.scene!.frame.midY))
+        
+        self.addChild(snake!)
+        
+        self.physicsWorld.contactDelegate = self
+        
+        self.physicsBody?.categoryBitMask = CollisionCategory.EdgeBody
+        self.physicsBody?.collisionBitMask = CollisionCategory.Snake | CollisionCategory.SnakeHead
+
+    }
+    
+    func createApple(){
+        
+        let randX = CGFloat(arc4random_uniform(UInt32(view!.scene!.frame.maxX-10)))
+        let randY = CGFloat(arc4random_uniform(UInt32(view!.scene!.frame.maxY-10)))
+        
+        let apple = Apple(position: CGPoint(x: randX, y: randY))
+        self.addChild(apple)
+        
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -54,6 +87,11 @@ class GameScene: SKScene {
             
             touchesNode.fillColor = .lightGray
             
+            if touchesNode.name == "counterClockwiseButton" {
+                snake!.moveCounterClockWisw()
+            }else if touchesNode.name == "clockwiseButton" {
+                snake!.moveClockWise()
+            }
         }
     }
 
@@ -75,5 +113,34 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+        
+        snake!.move()
+    
     }
+}
+
+extension GameScene: SKPhysicsContactDelegate {
+    
+    func didBegin(_ contact: SKPhysicsContact) {
+        
+        let bodyes = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
+        let collesionObject = bodyes - CollisionCategory.SnakeHead
+        
+        switch collesionObject {
+        case CollisionCategory.Apple:
+            let apple = contact.bodyA.node is Apple ? contact.bodyA
+                .node : contact.bodyB.node
+            snake?.addBodyPart()
+            apple?.removeFromParent()
+            createApple()
+        case CollisionCategory.EdgeBody:
+        //home
+        break
+        
+        default:
+            break
+
+        }
+    }
+    
 }
